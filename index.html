@@ -1,5 +1,4 @@
- <!DOCTYPE html><html lang="tr">
-<head>
+<!DOCTYPE html><html lang="tr"><head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Currents Player</title>
@@ -21,10 +20,13 @@ body{margin:0;background:radial-gradient(circle at 30% 20%,var(--purple2),var(--
 .controls button{background:none;border:none;color:white;font-size:20px;cursor:pointer}
 input[type=range]{accent-color:#9b5cff}
 .volume{width:120px}
+#unlockScreen{position:fixed;inset:0;background:rgba(10,10,15,0.55);backdrop-filter:blur(25px);display:flex;align-items:center;justify-content:center;z-index:9999}
+.unlockBox{color:white;text-align:center;padding:30px 40px;border-radius:28px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15)}
 @media(max-width:800px){body,.app{flex-direction:column}.sidebar{width:100%;border-right:none;border-bottom:1px solid rgba(255,255,255,.1)}}
 </style>
 </head>
 <body>
+<div id="unlockScreen"><div class="unlockBox"><h2>Tap to Start</h2><p>Enable audio</p></div></div>
 <div class="app">
   <div class="sidebar">
     <div class="card"><div class="clock" id="clock">--:--</div></div>
@@ -37,35 +39,15 @@ input[type=range]{accent-color:#9b5cff}
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
 const songs=[{name:"Let It Happen",id:"O2Gv82VsuuE"},{name:"The Less I Know The Better",id:"O2l2S6H-h3k"},{name:"Eventually",id:"Gidp-8rU-80"},{name:"New Person, Same Old Mistakes",id:"S7OOO9atD4Y"}];
-let player,current=0,playing=false;
-function onYouTubeIframeAPIReady(){player=new YT.Player('yt',{height:'0',width:'0',videoId:songs[0].id,playerVars:{autoplay:0,controls:0,playsinline:1,origin:location.origin},events:{onReady:()=>player.setVolume(70)}})}
+let player=null,current=0,playing=false,unlocked=false,ready=false;function render(){const list=document.getElementById('list');list.innerHTML='';songs.forEach((s,i)=>{const div=document.createElement('div');div.className='song'+(i===current?' active':'');div.textContent=s.name;div.onclick=()=>playSong(i);list.appendChild(div)})}
 
-let unlocked = false;
+function onYouTubeIframeAPIReady(){player=new YT.Player('yt',{height:'0',width:'0',videoId:songs[0].id,playerVars:{autoplay:0,controls:0,playsinline:1,origin:location.origin},events:{onReady:()=>{player.setVolume(70);ready=true;}}})}
 
-document.getElementById("unlockScreen").addEventListener("click", () => {
+function playSong(i){if(!ready)return;current=i;player.loadVideoById(songs[i].id);setTimeout(()=>{player.playVideo();playing=true;updateUI();render();},120)} function togglePlay(){if(!ready)return;if(playing){player.pauseVideo();playing=false}else{player.playVideo();playing=true}updateUI()} function nextSong(){current=(current+1)%songs.length;playSong(current)} function prevSong(){current=(current-1+songs.length)%songs.length;playSong(current)} function setVolume(v){if(player)player.setVolume(v)} function updateUI(){document.getElementById('np').textContent=songs[current].name;document.getElementById('barTitle').textContent=songs[current].name;document.getElementById('playBtn').textContent=playing?'⏸':'▶'}
 
-    if(unlocked) return;
-    unlocked = true;
+setInterval(()=>{const d=new Date();document.getElementById('clock').textContent=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})},1000); render();
 
-    player.playVideo();
-    player.pauseVideo();
+// mobile audio unlock window.addEventListener('pointerdown',()=>{if(unlocked||!ready)return;unlocked=true;player.playVideo();setTimeout(()=>player.pauseVideo(),50);document.getElementById('unlockScreen').style.display='none';},{once:true}); </script>
 
-    document.getElementById("unlockScreen").style.display="none";
-}); render(){const list=document.getElementById('list');list.innerHTML='';songs.forEach((s,i)=>{const div=document.createElement('div');div.className='song'+(i===current?' active':'');div.textContent=s.name;div.onclick=()=>playSong(i);list.appendChild(div)})}
-function playSong(i){current=i;if(!player||!player.loadVideoById)return;player.loadVideoById(songs[i].id);setTimeout(()=>{player.playVideo();playing=true;updateUI();render();},120);}
-function togglePlay(){if(!player||!player.getPlayerState)return;if(playing){player.pauseVideo();playing=false}else{player.playVideo();playing=true}updateUI()}
-function nextSong(){current=(current+1)%songs.length;playSong(current)}
-function prevSong(){current=(current-1+songs.length)%songs.length;playSong(current)}
-function setVolume(v){player.setVolume(v)}
-function updateUI(){document.getElementById('np').textContent=songs[current].name;document.getElementById('barTitle').textContent=songs[current].name;document.getElementById('playBtn').textContent=playing?'⏸':'▶'}
-setInterval(()=>{const d=new Date();document.getElementById('clock').textContent=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})},1000);
-render();
-  <div id="unlockScreen">
-  <div class="unlockBox">
-    <h2>Tap to Start</h2>
-    <p>Enable audio</p>
-  </div>
-</div>
-</script>
 </body>
 </html>
