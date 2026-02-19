@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Currents Player</title>
+<style>
+:root{--black:#050505;--purple:#2a0f3f;--purple2:#4a1a6a;--metal:#9aa0a6}
+*{box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
+body{margin:0;background:radial-gradient(circle at 30% 20%,var(--purple2),var(--black));color:white;min-height:100vh;display:flex}
+.app{display:flex;width:100%;min-height:100vh}
+.sidebar{width:320px;backdrop-filter:blur(18px);background:rgba(255,255,255,.06);border-right:1px solid rgba(255,255,255,.08);padding:24px;display:flex;flex-direction:column;gap:24px}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:18px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.clock{font-size:40px;font-weight:600;letter-spacing:1px}
+.nowplaying-title{font-size:14px;color:var(--metal)}
+.nowplaying-song{font-size:18px;margin-top:6px}
+.content{flex:1;padding:28px 28px 120px}
+.song{padding:16px;border-radius:16px;margin-bottom:10px;background:rgba(255,255,255,.03);cursor:pointer;transition:.25s}
+.song:hover{background:rgba(255,255,255,.08);transform:translateX(4px)}
+.song.active{background:rgba(255,255,255,.14)}
+.playerbar{position:fixed;bottom:0;left:0;right:0;background:rgba(10,10,10,.85);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.08);padding:14px 20px;display:flex;align-items:center;gap:20px}
+.controls button{background:none;border:none;color:white;font-size:20px;cursor:pointer}
+input[type=range]{accent-color:#9b5cff}
+.volume{width:120px}
+@media(max-width:800px){body,.app{flex-direction:column}.sidebar{width:100%;border-right:none;border-bottom:1px solid rgba(255,255,255,.1)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="sidebar">
+    <div class="card"><div class="clock" id="clock">--:--</div></div>
+    <div class="card"><div class="nowplaying-title">Şu An Çalıyor</div><div class="nowplaying-song" id="np">Hiçbir şey</div></div>
+  </div>
+  <div class="content" id="list"></div>
+</div>
+<div class="playerbar"><div id="barTitle">Bir şarkı seç</div><div class="controls"><button onclick="prevSong()">⏮</button><button onclick="togglePlay()" id="playBtn">▶</button><button onclick="nextSong()">⏭</button></div><input class="volume" type="range" min="0" max="100" value="70" oninput="setVolume(this.value)"></div>
+<div id="yt" style="display:none"></div>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script>
+const songs=[{name:"Let It Happen",id:"O2Gv82VsuuE"},{name:"The Less I Know The Better",id:"O2l2S6H-h3k"},{name:"Eventually",id:"Gidp-8rU-80"},{name:"New Person, Same Old Mistakes",id:"S7OOO9atD4Y"}];
+let player,current=0,playing=false;
+function onYouTubeIframeAPIReady(){player=new YT.Player('yt',{height:'0',width:'0',videoId:songs[0].id,playerVars:{autoplay:0,controls:0,playsinline:1,origin:location.origin},events:{onReady:()=>player.setVolume(70)}})}
+function render(){const list=document.getElementById('list');list.innerHTML='';songs.forEach((s,i)=>{const div=document.createElement('div');div.className='song'+(i===current?' active':'');div.textContent=s.name;div.onclick=()=>playSong(i);list.appendChild(div)})}
+function playSong(i){current=i;if(!player||!player.loadVideoById)return;player.loadVideoById(songs[i].id);setTimeout(()=>{player.playVideo();playing=true;updateUI();render();},120);}
+function togglePlay(){if(!player||!player.getPlayerState)return;if(playing){player.pauseVideo();playing=false}else{player.playVideo();playing=true}updateUI()}
+function nextSong(){current=(current+1)%songs.length;playSong(current)}
+function prevSong(){current=(current-1+songs.length)%songs.length;playSong(current)}
+function setVolume(v){player.setVolume(v)}
+function updateUI(){document.getElementById('np').textContent=songs[current].name;document.getElementById('barTitle').textContent=songs[current].name;document.getElementById('playBtn').textContent=playing?'⏸':'▶'}
+setInterval(()=>{const d=new Date();document.getElementById('clock').textContent=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})},1000);
+render();
+</script>
+</body>
+</html>
