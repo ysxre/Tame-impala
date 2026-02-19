@@ -48,6 +48,12 @@ function setVolume(v){player.setVolume(v)}
 function updateUI(){document.getElementById('np').textContent=songs[current].name;document.getElementById('barTitle').textContent=songs[current].name;document.getElementById('playBtn').textContent=playing?'⏸':'▶'}
 setInterval(()=>{const d=new Date();document.getElementById('clock').textContent=d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})},1000);
 render();
+  <div id="unlockScreen">
+  <div class="unlockBox">
+    <h2>Tap to Start</h2>
+    <p>Enable audio</p>
+  </div>
+</div>
 </script>
 </body>
 </html>
