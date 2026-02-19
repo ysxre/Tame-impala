@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="tr">
+ <!DOCTYPE html><html lang="tr">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -39,7 +39,19 @@ input[type=range]{accent-color:#9b5cff}
 const songs=[{name:"Let It Happen",id:"O2Gv82VsuuE"},{name:"The Less I Know The Better",id:"O2l2S6H-h3k"},{name:"Eventually",id:"Gidp-8rU-80"},{name:"New Person, Same Old Mistakes",id:"S7OOO9atD4Y"}];
 let player,current=0,playing=false;
 function onYouTubeIframeAPIReady(){player=new YT.Player('yt',{height:'0',width:'0',videoId:songs[0].id,playerVars:{autoplay:0,controls:0,playsinline:1,origin:location.origin},events:{onReady:()=>player.setVolume(70)}})}
-function render(){const list=document.getElementById('list');list.innerHTML='';songs.forEach((s,i)=>{const div=document.createElement('div');div.className='song'+(i===current?' active':'');div.textContent=s.name;div.onclick=()=>playSong(i);list.appendChild(div)})}
+
+let unlocked = false;
+
+document.getElementById("unlockScreen").addEventListener("click", () => {
+
+    if(unlocked) return;
+    unlocked = true;
+
+    player.playVideo();
+    player.pauseVideo();
+
+    document.getElementById("unlockScreen").style.display="none";
+}); render(){const list=document.getElementById('list');list.innerHTML='';songs.forEach((s,i)=>{const div=document.createElement('div');div.className='song'+(i===current?' active':'');div.textContent=s.name;div.onclick=()=>playSong(i);list.appendChild(div)})}
 function playSong(i){current=i;if(!player||!player.loadVideoById)return;player.loadVideoById(songs[i].id);setTimeout(()=>{player.playVideo();playing=true;updateUI();render();},120);}
 function togglePlay(){if(!player||!player.getPlayerState)return;if(playing){player.pauseVideo();playing=false}else{player.playVideo();playing=true}updateUI()}
 function nextSong(){current=(current+1)%songs.length;playSong(current)}
