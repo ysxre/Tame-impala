@@ -35,6 +35,12 @@ input[type=range]{accent-color:#9b5cff}
 </div>
 <div class="playerbar"><div id="barTitle">Bir şarkı seç</div><div class="controls"><button onclick="prevSong()">⏮</button><button onclick="togglePlay()" id="playBtn">▶</button><button onclick="nextSong()">⏭</button></div><input class="volume" type="range" min="0" max="100" value="70" oninput="setVolume(this.value)"></div>
 <div id="yt" style="display:none"></div>
+  <div id="unlockScreen">
+  <div class="unlockBox">
+    <h2>Tap to Start</h2>
+    <p>Enable audio</p>
+  </div>
+</div>
 <script src="https://www.youtube.com/iframe_api"></script>
 <script>
 const songs=[{name:"Let It Happen",id:"O2Gv82VsuuE"},{name:"The Less I Know The Better",id:"O2l2S6H-h3k"},{name:"Eventually",id:"Gidp-8rU-80"},{name:"New Person, Same Old Mistakes",id:"S7OOO9atD4Y"}];
